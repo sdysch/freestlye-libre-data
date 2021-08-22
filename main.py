@@ -2,29 +2,35 @@ import requests
 import json
 import pprint
 import pandas as pd
+import os
 
 SETTINGS = "settings.json"
 
 def get_data():
-    settings = load_settings()
     response = requests.get(
         "https://api.libreview.io/glucoseHistory?numPeriods=5&period=7",
         #"https://api.libreview.io/glucoseHistory?numPeriods=5&period=90",
-        headers = {"Authorization": "Bearer {}".format(settings["api_token"])}
+        headers = {"Authorization": "Bearer {}".format(get_API_token())}
     )
     return response.json()
 
 # ====================================================================================================
 
-def load_settings():
-    with open(SETTINGS, "r") as f:
-        return json.load(f)
+def get_API_token():
+
+    try:
+        token = os.environ["LIBREVIEW_API_TOKEN"]
+    except:
+        print("Please ensure that LIBREVIEW_API_TOKEN environment variable is set. Did you run setup.sh?")
+        exit(1)
+
+    return token
 
 # ====================================================================================================
 
 def main():
     data = get_data()
-    #pprint.pprint(data)
+    pprint.pprint(data)
 
 # ====================================================================================================
 
